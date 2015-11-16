@@ -1,0 +1,22 @@
+-incdir ../mips
+
+ tb.sv
+ checking.sv
+ ../mips/instr_mem.v
+ ../mips/register_file.v
+ ../mips/extender.v
+ ../mips/shifter.v
+ ../mips/alu.v
+ ../mips/alu_cu.v
+ ../mips/data_mem.v
+ ../mips/mips_cu.v
+ ../mips/fetch.v
+ ../mips/decode.v
+ ../mips/execute.v
+ ../mips/mem_access.v
+ ../mips/hazard_cu.v
+ ../mips/coprocessor.v
+ ../mips/coprocessor_cu.v
+ ../mips/core.v
+
+ 

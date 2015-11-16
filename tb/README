@@ -1,0 +1,56 @@
+About this mips.
+He has some bugs, and I will fix them on holidays.
+
+This mips has 5 stages of pipeline:fetch, decode, execute, memoru access, write back.
+I dont make module write back stage as in this module will be only wires.
+Also there is coprocessor, which handle external interrupt, and 3 exeption - wrong instruction, overflow, wring addres to memory of data.
+in addres 12 to coprocessor you can write bits which enable interrupts:
+
+{28'b0, all int enable, external int, wrong data addres, overflow, wrong_insrtuction} 
+
+From begin all this bits equal zero.
+
+Also epc take addres of command which makes exeption, so if we meet another interrupt, mips have not time to make any command from main program:(
+
+When we have command eret(in asm code rfe(return from exeption)), need do many bublles because wait untill all command from interrupt handler will do.
+
+command which do my mips:
+add
+addu
+sub
+subu
+and
+or
+xor
+nor
+slt
+sltu
+sllv
+rorv
+srlv
+srav
+
+
+sll
+ror
+srl
+sra
+addi
+addiu
+andi
+ori
+xori
+lui
+
+j
+jr
+
+beq
+bne
+
+lw
+sw
+
+mtc0
+mfc0
+eret  - load epc to pc & interrupt enable
