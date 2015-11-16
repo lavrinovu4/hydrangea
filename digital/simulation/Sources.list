@@ -1,0 +1,7 @@
+-incdir ../design/mips
+-incdir ../models/model_data_mem/
+-incdir ../models/model_instr_mem/
+
+ tb.sv
+ checking.sv
+  

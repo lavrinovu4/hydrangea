@@ -1,5 +1,26 @@
--incdir ../mips
+../models/model_data_mem/data_mem.v
+ ../models/model_data_mem/wb_slave_test.v
+ ../models/model_instr_mem/instr_mem.v
+ ../design/mips/additional_alu.v
+ ../design/mips/alu_cu.v
+ ../design/mips/alu.v
+ ../design/mips/coprocessor.v
+ ../design/mips/core.v
+ ../design/mips/decode.v
+ ../design/mips/execute.v
+ ../design/mips/fetch.v
+ ../design/mips/hazard_cu.v
+ ../design/mips/mem_access.v
+ ../design/mips/mips_cu.v
+ ../design/mips/register_file.v
+ ../design/mips/shifter.v
+ ../design/mips/wishbone.v
+-incdir
+ ./../design/mips
+-incdir
+ ./../models/model_data_mem/
+-incdir
+ ./../models/model_instr_mem/
+ ./tb.sv
+ ./checking.sv
 
- tb.sv
- checking.sv
-  

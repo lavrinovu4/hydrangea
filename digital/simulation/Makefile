@@ -1,9 +1,16 @@
 COMP = mips-linux-gnu
+ALL_LIST_NAME ?= list
 
 all: check t0.dat t1.dat t2.dat t3.dat t4.dat t4.dat t5.dat t6.dat t7.dat sim
 
 clean: clean_v clean_cc
 clean_all: clean_v_all clean_cc_all
+
+SOURCES_LIST = ../models/model_data_mem ../models/model_instr_mem ../design/mips .
+FILE_LIST = $(foreach i,$(SOURCES_LIST),$(foreach file,$(shell cat $i/Sources.list),$i/$(file)"\n"))
+
+$(ALL_LIST_NAME): $(SOURCES_LIST)
+	echo -e $(FILE_LIST) > $@
 
 ##########################################################
 #
@@ -12,7 +19,6 @@ clean_all: clean_v_all clean_cc_all
 ##########################################################
 SIM_FLAGS +=
 DEBUG_SIM_FLAGS +=
-ALL_LIST_NAME ?= list
 
 .PHONY: help sim debug-sim elaborate clean_v clean_v_all
 
@@ -68,4 +74,4 @@ clean_cc:
 clean_cc_all: clean_cc
 	rm -f *.dat
 
-.SILENT:
+# .SILENT:

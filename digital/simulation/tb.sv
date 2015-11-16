@@ -18,8 +18,6 @@ module tb;
 
   integer i, end_test; 
 
-  wire []  
-
   wire                    mips_wb_we;
   wire [3:0]              mips_wb_sel;
   wire [31:0]             mips_wb_adr;
