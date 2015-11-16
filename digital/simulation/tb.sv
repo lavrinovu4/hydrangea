@@ -2,16 +2,23 @@
 
 `define BOOT_FILE
 
+`define PATH_DATA_MEM u_wb_slave.u_data_mem.mem_data
+`define PATH_INST_MEM u_instr_mem.mem
+
 module tb;
-	reg clk, arst_n, ext_int;
+  reg clk, arst_n;
+  reg [8:0] ext_int;
 
-	parameter PERIOD = 20;
+  parameter PERIOD = 20;
   parameter N_TEST = 8;               //number of tests  
-  parameter ADDR_VALID_TRUE = 1;      //address of valid data inside memory of data - if you change them
-                                      //you need chenge this addres in your test file
-  parameter ADDR_RECEIVED_DATA = 2;   //addres where test save data result
 
-  localparam NAME_WIDTH = 12;
+  parameter EXPIRED_NUMBER_CLK = 600;
+
+  parameter ADDR_VALID_TRUE = 320;      //address of flag valid data inside memory of data
+  parameter ADDR_RECEIVED_DATA = 321;   //addres where test save data result
+
+  localparam NAME_WIDTH = 16;
+
   reg [8*NAME_WIDTH : 0] name_test [N_TEST - 1 : 0];
   reg [31 : 0] data_expected [N_TEST - 1 : 0];
   reg [31 : 0] value;
@@ -49,9 +56,10 @@ module tb;
     .o_wb_ack     (mips_wb_ack)
   );
 
+  //the highest module of mips
   core #(
-    .N_INTS       ( 1 ))
-   u_mips_core (
+    .N_INTS       ( 9 ))
+   u_core (
     .i_clk        (clk), 
     .i_arst_n     (arst_n ), 
     .i_int_source (ext_int),
@@ -70,12 +78,6 @@ module tb;
     .o_wb_stb     (mips_wb_stb)
   );
 
-  //the highest module of mips
-	core u_core(
-		.i_clk				( clk 		),
-		.i_arst_n			( arst_n 	),
-    .i_ext_int    ( ext_int ));
-
   //check coorect signal inside mips
   checking u_checking(
     .i_clk        (clk), 
@@ -84,13 +86,13 @@ module tb;
 
   //generate clock
   initial begin
-		clk = 0;
-		forever clk = #(PERIOD/2) ~clk;
-	end
+    clk = 0;
+    forever clk = #(PERIOD/2) ~clk;
+  end
   
 
   //generate input data
-	initial begin
+  initial begin
     ext_int = 0;
     @(negedge clk); 
 
@@ -99,31 +101,31 @@ module tb;
     end
 
     @(negedge clk);
-		$finish;
-	end
+    $finish;
+  end
 
   //check correct work of mips
   initial begin
     forever begin
-      @(posedge end_test);
-      value = u_core.u_mem_access.u_data_mem.mem_data[ADDR_RECEIVED_DATA];
-      if(value == data_expected[i - 1])
-      	$display("----------------- TEST SUCCESS\n");
-		  else
-			  $display("----------------- TEST FAILED\n");
+      @(posedge (end_test == 1));
+      value = `PATH_DATA_MEM[ADDR_RECEIVED_DATA];
+      if(value == data_expected[i])
+        $display("----------------- \nTEST SUCCESS\n----------------- \n");
+      else
+        $display("----------------- \nError!! TEST FAILED\n----------------- \n");
     end 
   end
 
-	initial begin
-		$dumpfile("wave.vcd");
+  initial begin
+    $dumpfile("wave.vcd");
     $dumpvars(5);
-	end
+  end
 
   task load_test;
     input [8*NAME_WIDTH : 0] name;
   begin
     $display(" Loading %s", name);
-    $readmemh(name, u_core.u_fetch.u_instr_mem.mem);
+    $readmemh(name, `PATH_INST_MEM);
   end
   endtask
 
@@ -134,43 +136,65 @@ module tb;
     @(negedge clk);
     arst_n = 0;
     load_test(name);
-		@(negedge clk) arst_n = 1;
+    @(negedge clk) arst_n = 1;
 
-    await_count = 600;
-    end_test = u_core.u_mem_access.u_data_mem.mem_data[ADDR_VALID_TRUE];
+    await_count = EXPIRED_NUMBER_CLK;
+
+    end_test = `PATH_DATA_MEM[ADDR_VALID_TRUE];
     while((1 !== end_test) && (0 != await_count)) begin
       await_count--;
       @(negedge clk);
-      end_test = u_core.u_mem_access.u_data_mem.mem_data[ADDR_VALID_TRUE];
+      end_test = `PATH_DATA_MEM[ADDR_VALID_TRUE];
     end
-    if(!await_count)
+    if(!await_count) begin
       $display("error: Out of time");
-    u_core.u_mem_access.u_data_mem.mem_data[ADDR_VALID_TRUE] = 0;
+      $finish;
+    end
+    @(negedge mips_wb_ack);
+    `PATH_DATA_MEM[ADDR_VALID_TRUE] = 0;
   end
   endtask
 
-  //external inerrupt generation
-  initial begin
-    repeat(10) @(posedge clk);
-    forever begin
-      repeat(5) @(posedge clk);
-      if(i == 6) begin
-        repeat(18) @(posedge clk);
-          ext_int = ~ext_int;
-        end
-    end
-  end
-
   //test data for mips
   initial begin
-    name_test[0] = "t0.dat"; data_expected[0] = 21;       //addi, add, beq, sw 
-    name_test[1] = "t1.dat"; data_expected[1] = 2;        //immediate instructions, hazards, negative numbers
-    name_test[2] = "t2.dat"; data_expected[2] = 7;        //add, sub, and, or, slt, addi, lw, sw, beq, j
-    name_test[3] = "t3.dat"; data_expected[3] = 0;        //coprocessor
-    name_test[4] = "t4.dat"; data_expected[4] = 1;        //Overflow exception test
-    name_test[5] = "t5.dat"; data_expected[5] = 'h3f8;    //all shift
-    name_test[6] = "t6.dat"; data_expected[6] = 'h10;     //external interrupt
-    name_test[7] = "t7.dat"; data_expected[7] = 1;        //wrong instruction exeption
+    name_test[0] = "t0.dat"; data_expected[0] = 21;                             //addi, add, beq, sw 
+    name_test[1] = "t1.dat"; data_expected[1] = 2;                              //immediate instructions, hazards, negative numbers
+    name_test[2] = "t2.dat"; data_expected[2] = 7;                              //add, sub, and, or, slt, addi, lw, sw, beq, j
+    name_test[3] = "t3.dat"; data_expected[3] = 'h3f8;                          //all shift
+    name_test[4] = "t4.dat"; data_expected[4] = 2;                              //bgez, bgezal, bgtz, blez, bltz, bltzal
+    name_test[5] = "t5.dat"; data_expected[5] = 32'h12000000 + 32'h12345678 +
+                                                32'h12340000 + 32'h12345678 +
+                                                32'h12345600 + 32'h12345678 +
+                                                32'h12345678 + 32'h11111111 + //lwl, lwr, swl, swr
+                                                
+                                                32'h90 + 32'hffffff90 +         //lb, lbu, sb, sbu 
+                                                32'h8072 + 32'hffff8072 + //lh, lhu, sh
+                                                32'h0fff + 32'h0fff;    //lw, sw
+
+    name_test[6] = "t6.dat"; data_expected[6] = 130; //124; //130;        //mult,div,mfhi,mflo
+    name_test[7] = "t7.dat"; data_expected[7] = 16396;        //interrupts and exceptions
   end
+
+  wire [31 : 0] pc;
+  assign pc = adr_instruction << 2;
+
+  initial begin
+    @(i === 7);
+    @(pc === 32'h7c);
+
+    ext_int = 9'h1;
+
+    #230 ext_int = ext_int << 1;
+    #130 ext_int = ext_int << 1;
+    #530 ext_int = ext_int << 1;
+    #200 ext_int = ext_int << 1;
+    #290 ext_int = ext_int << 1;
+    #930 ext_int = ext_int << 1;
+    #70 ext_int = ext_int << 1;
+    #340 ext_int = ext_int << 1;
+    #730 ext_int = ext_int << 1;
+  end
+
+ `define PC (tb.u_core.u_fetch.o_pc_fe << 2)
 
 endmodule

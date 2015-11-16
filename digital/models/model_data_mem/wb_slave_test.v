@@ -2,8 +2,6 @@
 
 `timescale 1ns / 1ps
 
-`include "config.vh"
-
 module wb_slave_test (			
 														i_ck,
 														i_rb,
@@ -22,13 +20,13 @@ module wb_slave_test (
 	input										i_rb;
 																			
 	input 										i_wb_we;
-	input [`WB_SWIDTH - 1:0]	i_wb_sel;
-	input	[`WB_AWIDTH - 1:0]  i_wb_adr;
-	input	[`WB_DWIDTH - 1:0]	i_wb_dat;
+	input [3:0]	i_wb_sel;
+	input	[31:0]  i_wb_adr;
+	input	[31:0]	i_wb_dat;
 	input											i_wb_cyc;
 	input											i_wb_stb;
 	
-	output	[`WB_DWIDTH - 1:0]	o_wb_dat;
+	output	[31:0]	o_wb_dat;
 	output											o_wb_ack;																		
 	
 	////////////////////////////////////////

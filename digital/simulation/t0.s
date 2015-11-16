@@ -4,8 +4,6 @@
 # Expected Behavior:
 #   Fibinnacci Sequence.  
 
-# Prevent the assembler from reordering and filling in branch delay slots
-.set noreorder
 
 main:   addi $2, $0, 0          # initialize $2 = 0
         addi $3, $0, 1          # initialize $3 = 1
@@ -14,20 +12,13 @@ loop:   add  $4, $2, $3         # $4 <= $2 + $3
         add  $2, $3, $0         # $2 <= $3
         add  $3, $4, $0         # $3 <= $4
         beq  $4, $5, write      # when sum is 21, jump to write
-        nop
         beq  $0, $0, loop       # loop (beq is easier to assemble than jump)
-        nop
-write:  sw   $4, 7($2)          # should write 21 @ 7 + 13 = 20 = 0x14
+write:  sw   $4, 0x507($2)          # should write 21 @ 0x507 + 13 = 0x514
       
-        addi $2, $0, 20
-        lw   $3, 0($2)
-
-        addi $2, $0, 8
-        sw   $3, 0($2)          #save data to addrees 8/4=2
+        lw   $3, 0x514($0)
+        sw   $3, 0x504($0)          #save data to addrees 8/4=2
 
         addi $3, $0, 1
-        subu  $2, $2, 4
-        sw   $3, 0($2)          #write to addres 4/4=1 - our data is valid
+        sw   $3, 0x500($0)          #write to addres 4/4=1 - our data is valid
 
 end:    beq  $0, $0, end        # loop forever
-        nop

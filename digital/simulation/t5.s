@@ -1,39 +1,88 @@
-# Harvey Mudd College VLSI MIPS Project
-# Carl Nygaard
-# Spring, 2007
-#
-# Test 004
-#
-# Created: 1/1/07
-#
-#   Tests shift operations.
+#byte
+addiu $2, $0, 0x90
+addiu $3, $0, 0x17
 
-.set noreorder
+sb $2, 0($3)
+sb $2, 3($3)
 
-main:   addiu $2, $0, 0x7f      # $2 = 0x7f
-        srl   $3, $2, 5         # $3 = 0x7f >> 5 = 0x03
-        sllv  $2, $2, $3        # $2 = 0x7f << 3 = 0x3f8
-        sll   $4, $2, 22        # $4 = 0x3f8 << 22 = 0xffc00000
-        sra   $4, $4, 22        # $4 = 0xffc00000 >>> 22 = 0xffffffff
-        lui   $5, 0x8000        # $5 = 0x8000000
-        xor   $4, $4, $5        # $4 = 0xffffffff ^ 0x80000000 = 0x7fffffff
-        ori   $5, $0, 5         # $5 = 5
-        srav  $4, $4, $5        # $4 = 0x7fffffff >> 5 = 0x03ffffff
-        sllv  $4, $4, $3        # $4 = 0x03ffffff << 3 = 0x1ffffff8
-        srl   $3, $3, 1         # $3 = 0x03 >> 1 = 0x01
-        srlv  $4, $4, $3        # $4 = 0x1ffffff8 >> 1 = 0x0ffffffc
-        sw    $2, 0($4)         # should write 0x3f8 to address 0x0ffffffc
+lb $4, 0($3)
+lbu $5, 3($3)
 
-        lui  $2, 0x0fff
-        ori  $2, $2, 0xfffc
-        lw   $3, 0($2)
+add $6, $5, $4
 
-        addi $2, $0, 8
-        sw   $3, 0($2)          #save data to addrees 8/4=2
 
-        addi $3, $0, 1
-        subu  $2, $2, 4
-        sw   $3, 0($2)          #write to addres 4/4=1 - our data is valid
+#halfword
+addiu $2, $0, 0x8072
+addiu $3, $0, 0x62
 
-end:    beq   $0, $0, end       # loop forever
-        nop
+sh $2, 0($3)
+sh $2, 2($3)
+
+lh $4, 0($3)
+lhu $5, 2($3)
+
+add $7, $5, $4
+add $7, $6, $7
+
+
+#word
+addiu $2, $0, 0x0fff
+addiu $3, $0, 0x40
+
+sw $2, 0($3)
+sw $2, 8($3)
+
+lw $8, 0($3)
+lw $9, 8($3)
+
+add $10, $8, $9
+add $7, $7, $10
+
+#left and right words
+add $5, $0, $0
+lui $2, 0x1234
+ori $2, $2, 0x5678
+#1/4 and 3/4 word
+addiu $3, $0, 0x10
+jal proc
+#2/4 and 2/4 word
+addiu $3, $3, 1
+jal proc
+#3/4 and 1/4 word
+addiu $3, $3, 1
+jal proc
+
+#1 word
+addiu $3, $0, 0x10
+swl $2, 3($3) 
+lwl $2, 3($3)
+add $5, $5, $2 
+
+#1 word
+add $2, $0, $0
+lui $2, 0x1111
+or 	$2, $2, 0x1111
+swr $2, 0($3) 
+lwr $2, 0($3)
+addu $5, $5, $2 
+
+addu $7, $7, $5
+
+sw $7, 0x504($0)
+ori $2, $0, 1
+sw $2, 0x500($0)
+
+loop:
+j loop
+
+
+proc:
+	add $4, $0, $0
+	swl $2, 0($3)
+	swr $2, 1($3)
+	lwl $4, 0($3)
+	add $5, $5, $4
+	lwr $4, 1($3)
+	add $5, $5, $4
+
+	jr $31

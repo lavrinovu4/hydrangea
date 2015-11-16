@@ -18,21 +18,17 @@ main:   addi $2, $0, 5          # initialize $2 = 5     0       20020005        
 around: slt  $4, $7, $2         # $4 = 3 < 5 = 1        28      00e2202a        a 
         add  $7, $4, $5         # $7 = 1 + 11 = 12      2c      00853820        b
         sub  $7, $7, $2         # $7 = 12 - 5 = 7       30      00e23822        c
-        sw   $7, 68($3)         # [80] = 7              34      ac670044        d
-        lw   $2, 80($0)         # $2 = [80] = 7         38      8c020050        e
+        sw   $7, 0x580($3)         # [58c] = 7              34      ac670128        d
+        lw   $2, 0x58c($0)         # $2 = [58c] = 7         38      8c020134        e
         j    end                # should be taken       3c      08000011        f
         addi $2, $0, 1          # shouldn't happen      40      20020001        10
-end:    sw   $2, 84($0)         # write adr 84 = 7      44      ac020054        11
+end:    sw   $2, 0x590($0)         # write adr 84 = 7      44      ac020074        11
 
-        addi $2, $0, 84
-        lw   $3, 0($2)
-
-        addi $2, $0, 8
-        sw   $3, 0($2)          #save data to addrees 8/4=2
+        lw   $3, 0x590($0)
+        sw   $3, 0x504($0)          #save data to addrees 8/4=2
 
         addi $3, $0, 1
-        subu  $2, $2, 4
-        sw   $3, 0($2)          #write to addres 4/4=1 - our data is valid
+        sw   $3, 0x500($0)          #write to addres 4/4=1 - our data is valid
 
 a_end:  j a_end
 
