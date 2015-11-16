@@ -1,0 +1,14 @@
+additional_alu.v
+alu_cu.v
+alu.v
+coprocessor.v
+core.v
+decode.v
+execute.v
+fetch.v
+hazard_cu.v
+mem_access.v
+mips_cu.v
+register_file.v
+shifter.v
+wishbone.v

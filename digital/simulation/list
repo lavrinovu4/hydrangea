@@ -1,0 +1,5 @@
+-incdir ../mips
+
+ tb.sv
+ checking.sv
+  
