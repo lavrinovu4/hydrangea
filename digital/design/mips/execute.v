@@ -88,6 +88,8 @@ module execute(i_clk, i_arst_n, i_stall_en,
 	wire en_execute;
 	wire kill_execute;
 
+	reg delay_slot_first;
+
 	//----------------------------------Code starts---------------------------------------------
 	
 	assign en_execute = ~i_stall_en;
@@ -167,10 +169,12 @@ module execute(i_clk, i_arst_n, i_stall_en,
 	//for epc
 	always @(posedge i_clk, negedge i_arst_n) begin
 		if(!i_arst_n) begin
-      o_pc_ex <= 0;                     
+      o_pc_ex <= 0;    
+      delay_slot_first <= 0;                 
 			o_delay_slot <= 0;
     end else if(en_execute) begin
-			o_delay_slot <= o_branch_en;
+    	delay_slot_first <= o_branch_en;
+			o_delay_slot <= delay_slot_first;
       o_pc_ex <= i_pc_de;
 		end
  end

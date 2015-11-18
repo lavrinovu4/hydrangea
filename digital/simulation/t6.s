@@ -2,16 +2,16 @@ addiu $2, $0, 31
 addiu $3, $0, 4
 mult $2, $3
 mflo $7                            #31 * 4 = 124
-div $2, $3                         
-mfhi $6                             #4 / 31 = 0
+div $2, $3                         #31/4
+mfhi $6                             #31 mod 4 = 3
 
-add $7, $7, $6                      #124
+add $7, $7, $6                      #127
 
 multu $2, $3
-mtlo $6 
-mflo $5                             #124
+mtlo $6                             #3
+mflo $5                             #3
 
-add $7, $7, $5                      #124
+add $7, $7, $5                      #130
 
 mthi $7
 mfhi $7

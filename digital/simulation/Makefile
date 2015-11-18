@@ -4,7 +4,8 @@ ALL_LIST_NAME ?= .list
 AFLAGS =  -mips1 -EL
 LFLAGS =  --no-check-sections -e 0 -Ttext 0 -Tbss 0x500 -EL 
 
-all: check t0.dat t1.dat t2.dat t3.dat t4.dat t4.dat t5.dat t6.dat t7.dat sim
+all: compile sim
+compile: check t0.dat t1.dat t2.dat t3.dat t4.dat t4.dat t5.dat t6.dat t7.dat
 
 clean: clean_v clean_cc
 clean_all: clean_v_all clean_cc_all
@@ -45,7 +46,7 @@ sim: $(ALL_LIST_NAME)
 
 clean_v:
 	rm -rf INCA_libs waves.shm .simvision
-	rm -f simvision* *.key *.log
+	rm -f simvision* *.key *.log verilog.dump restore*
 
 clean_v_all: clean
 	rm -f *.vcd

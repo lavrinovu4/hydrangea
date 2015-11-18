@@ -171,8 +171,8 @@ module tb;
                                                 32'h8072 + 32'hffff8072 + //lh, lhu, sh
                                                 32'h0fff + 32'h0fff;    //lw, sw
 
-    name_test[6] = "t6.dat"; data_expected[6] = 130; //124; //130;        //mult,div,mfhi,mflo
-    name_test[7] = "t7.dat"; data_expected[7] = 16396;        //interrupts and exceptions
+    name_test[6] = "t6.dat"; data_expected[6] = 130;          //mult,div,mfhi,mflo
+    name_test[7] = "t7.dat"; data_expected[7] = 32474 + 9;        //interrupts and exceptions
   end
 
   wire [31 : 0] pc;
@@ -180,7 +180,7 @@ module tb;
 
   initial begin
     @(i === 7);
-    @(pc === 32'h7c);
+    @(pc === 32'ha0);
 
     ext_int = 9'h1;
 
@@ -188,13 +188,11 @@ module tb;
     #130 ext_int = ext_int << 1;
     #530 ext_int = ext_int << 1;
     #200 ext_int = ext_int << 1;
-    #290 ext_int = ext_int << 1;
+    #291 ext_int = ext_int << 1; //TODO: strange strange behavior of simulator(interrupts and clk)
     #930 ext_int = ext_int << 1;
     #70 ext_int = ext_int << 1;
     #340 ext_int = ext_int << 1;
     #730 ext_int = ext_int << 1;
   end
-
- `define PC (tb.u_core.u_fetch.o_pc_fe << 2)
 
 endmodule

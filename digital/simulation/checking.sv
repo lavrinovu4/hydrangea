@@ -26,7 +26,7 @@ module checking(i_clk, i_arst_n, i);
 
  assign int_catch = u_core.u_coprocessor.o_int_only;
  assign jmp_en = u_core.u_fetch.i_jmp_en;
- assign pc_fe_eq1 = u_core.u_fetch.o_pc_fe == 1;
+ assign pc_fe_eq1 = u_core.u_fetch.o_pc_fe == 2;
 
  assign data_a = u_core.u_execute.u_alu.i_data_a;
  assign data_b = u_core.u_execute.u_alu.i_data_b;
@@ -57,7 +57,7 @@ module checking(i_clk, i_arst_n, i);
  assert property (test4_prop);
 
 sequence int_reaction;
- int_catch ##0 jmp_en ##1 pc_fe_eq1 ##1 jmp_en;
+ int_catch ##0 jmp_en ##1 pc_fe_eq1;
 endsequence
 
  property int_reaction_prop;
