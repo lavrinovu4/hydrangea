@@ -1,2 +1,2 @@
-data_mem.v
 wb_slave_test.v
+memory.v

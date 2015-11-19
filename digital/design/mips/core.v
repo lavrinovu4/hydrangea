@@ -4,13 +4,12 @@
 
 `timescale 1ns/1ps
 
-module core(i_clk, i_arst_n, i_int_source,
-
-						i_instr_mem, o_instr_adr,
+module core(i_clk, i_arst_n, i_core_en, i_int_source,
 					
 						o_wb_cyc, o_wb_stb, o_wb_sel, o_wb_we, o_wb_adr, o_wb_dat,
 						i_wb_dat, i_wb_ack	);
 
+  parameter PC_START_ADDRRES  = 0;
 	parameter DATA_WIDTH        = 32;                  //data in all mips are 32bits
 	parameter INSTR_ADDR_WIDTH  = 32;                 //2^26 program memory
 	parameter INSTR_WIDTH       = 32;
@@ -22,11 +21,9 @@ module core(i_clk, i_arst_n, i_int_source,
 	//-----------------------------------
 	input 									i_clk;
 	input 									i_arst_n;
+  input                   i_core_en;
 
   input [N_INTS - 1 : 0] 	i_int_source;
-
-	input [31 : 0] 					i_instr_mem;
-	output [29 : 0] 				o_instr_adr;
 
 	//wishbone-------------------
 	input	 							i_wb_ack;
@@ -135,19 +132,32 @@ module core(i_clk, i_arst_n, i_int_source,
 	wire 													mem_data_ack;
 
 
+  wire [31 : 0]           mem_instr_din;
+  wire [29 : 0]           mem_instr_adr;
+  wire                    mem_instr_ack;
+  wire                    mem_instr_req;
+
+  wire                    stall_en_fe;
+
+
 	assign exceptions = {div_zero, ovf_flag, wr_addr_data, wr_adr_instr, wr_instr};
 
-	assign o_instr_adr = pc_fe;
+	assign mem_instr_adr = pc_fe;
 
 	fetch #(
-		.INSTR_ADDR_WIDTH ( INSTR_ADDR_WIDTH 	))
+		.INSTR_ADDR_WIDTH ( INSTR_ADDR_WIDTH 	),
+    .PC_START_ADDRRES ( PC_START_ADDRRES  ))
 	 u_fetch(
 		.i_clk						( i_clk 				), 
 		.i_arst_n 				( i_arst_n			), 
+    .i_core_en        ( i_core_en     ), 
 		.i_jmp_en 			  ( jmp_en			  ),
 		.i_pc_jmp 				( pc_jmp 				),
 	
-		.i_instr_mem 			( i_instr_mem 	),
+		.i_instr_mem 			( mem_instr_din 	),
+    .i_read_ack       ( mem_instr_ack   ),
+    .o_read_req       ( mem_instr_req   ),
+    .o_stall_en_fe    ( stall_en_fe     ),
 
 		.i_ie_catch 			( ie_catch 			),
 		.i_stall_en_de 		( stall_en 			),	
@@ -215,14 +225,14 @@ module core(i_clk, i_arst_n, i_int_source,
 		.o_sec_alu_en			( sec_alu_en 		),
 		.o_sec_alu_op			(	sec_alu_op		),
 		.o_sel_sec_alu		( sel_sec_alu 	),
-		.i_stall_en				( stall_en_ex | stall_en_ma 	));
+		.i_stall_en				( stall_en_ex | stall_en_ma | stall_en_fe	));
 
 	execute #(
 		.INSTR_ADDR_WIDTH	( INSTR_ADDR_WIDTH   ))
 	 u_execute(
 		.i_clk						( i_clk 				), 
 		.i_arst_n 				( i_arst_n			),
-		.i_stall_en 			( stall_en_ma		), 
+		.i_stall_en 			( stall_en_ma	 | stall_en_fe	), 
 		.i_alu_ctrl 			( alu_ctrl 			), 
 		.i_data_a 				( rdout_a 			), 
 		.i_data_b 				( rdout_b 			), 
@@ -268,7 +278,7 @@ module core(i_clk, i_arst_n, i_int_source,
     .o_ovf_flag       ( ovf_flag      ),
     .o_wr_addr_data   ( wr_addr_data  ),
 
-		.o_stall_en_ex		(	stall_en_ex		));
+		.o_stall_en_ex		(	stall_en_ex	));
 
 	mem_access #(
     .PC_WIDTH         ( PC_WIDTH           ))
@@ -322,24 +332,30 @@ module core(i_clk, i_arst_n, i_int_source,
     .o_int_only       ( int_only     	));
 
 
-	 wishbone u_wishbone(
-		.o_wb_cyc					( o_wb_cyc			), 
-		.o_wb_stb					( o_wb_stb 			), 
-		.o_wb_sel					( o_wb_sel 			), 
-		.o_wb_we					( o_wb_we 			), 
-		.o_wb_adr					( o_wb_adr 			), 
-		.o_wb_dat					( o_wb_dat 			),
-		.i_wb_dat					( i_wb_dat 			), 
-		.i_wb_ack					( i_wb_ack 			),
-								
-		.i_clk						( i_clk					), 
-		.i_arst_n					( i_arst_n			), 
-		.i_adr						( mem_data_adr 	), 
-		.i_we							( mem_data_we 	), 
-		.i_re							( mem_data_re 	), 
-		.i_din						( mem_data_din 	), 
-		.i_sel						( mem_data_sel 	), 
-		.o_dout						( mem_data_dout	), 
-		.o_ack						( mem_data_ack 	));
+   wishbone u_wishbone(
+    .o_wb_cyc         ( o_wb_cyc      ), 
+    .o_wb_stb         ( o_wb_stb      ), 
+    .o_wb_sel         ( o_wb_sel      ), 
+    .o_wb_we          ( o_wb_we       ), 
+    .o_wb_adr         ( o_wb_adr      ), 
+    .o_wb_dat         ( o_wb_dat      ),
+    .i_wb_dat         ( i_wb_dat      ), 
+    .i_wb_ack         ( i_wb_ack      ),
+                
+    .i_clk            ( i_clk     ),
+    .i_rb             ( i_arst_n  ),
+    
+    .i_address_mem1   ( mem_instr_adr ),
+    .i_req_mem1       ( mem_instr_req ),
+    .o_data_mem1      ( mem_instr_din ),
+    .o_ack_mem1       ( mem_instr_ack ),
+
+    .i_address_mem2   ( mem_data_adr              ),
+    .i_req_mem2       ( mem_data_we | mem_data_re ),
+    .i_sel_mem2       ( mem_data_sel              ),
+    .o_data_mem2      ( mem_data_dout             ),
+    .i_wr_mem2        ( mem_data_we               ),
+    .i_data_mem2      ( mem_data_din              ),
+    .o_ack_mem2       ( mem_data_ack              ));
 
 endmodule
