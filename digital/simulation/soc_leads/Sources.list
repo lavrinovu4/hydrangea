@@ -1,0 +1,8 @@
+tb.sv
+../../digital/top
+
+COMPILE_COMM: cd compile; make
+
+EBS: -pc 'tb.u_dut.u_core.u_fetch.o_pc_fe << 2' -target test -step 200000
+MEM_WIDTH: 32
+COMP: mips-linux-gnu

@@ -1,1 +1,3 @@
-digital/simulation/.list
+digital/simulation/one_core/.list
+digital/simulation/soc_leds/.list
+*.simvision*

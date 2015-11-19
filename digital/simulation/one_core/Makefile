@@ -10,7 +10,7 @@ compile: check t0.dat t1.dat t2.dat t3.dat t4.dat t4.dat t5.dat t6.dat t7.dat
 clean: clean_v clean_cc
 clean_all: clean_v_all clean_cc_all
 
-SOURCES_LIST = . ../models/memory ../design/mips
+SOURCES_LIST = . ../../models/memory ../../design/mips
 
 FILE_LIST = $(foreach i,$(SOURCES_LIST),\
 								$(foreach file,$(shell cat $i/Sources.list),\
