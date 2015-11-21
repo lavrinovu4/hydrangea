@@ -1,3 +1,5 @@
-digital/simulation/one_core/.list
-digital/simulation/soc_leds/.list
+*.srclist
 *.simvision*
+*.o
+*.elf
+*INC_libs*

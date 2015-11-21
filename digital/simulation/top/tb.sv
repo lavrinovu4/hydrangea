@@ -3,11 +3,11 @@
 `define PATH_MEM u_dut.mem.u_mem.mem
 
 module tb;
-	reg clk, arst_n;
+  reg clk, arst_n;
 
-	parameter PERIOD = 20;              //50MHz
+  parameter PERIOD = 20;              //50MHz
   parameter N_TEST = 1;               //number of tests
-  parameter EXPIRED_NUMBER_CLK = 600; //max time for one test
+  parameter EXPIRED_NUMBER_CLK = 20000; //max time for one test
 
   parameter ADDR_VALID_TRUE = 320;      //address of flag valid data inside memory of data
   parameter ADDR_RECEIVED_DATA = 321;   //addres where test save data result
@@ -29,13 +29,13 @@ module tb;
 
   //generate clock
   initial begin
-		clk = 0;
-		forever clk = #(PERIOD/2) ~clk;
-	end
+    clk = 0;
+    forever clk = #(PERIOD/2) ~clk;
+  end
 
 
   //generate input data
-	initial begin
+  initial begin
     @(negedge clk);
 
     for(i = 0; i < N_TEST; i++) begin
@@ -43,8 +43,8 @@ module tb;
     end
 
     @(negedge clk);
-		$finish;
-	end
+    $finish;
+  end
 
   //check correct work of mips
   initial begin
@@ -52,17 +52,17 @@ module tb;
       @(posedge (end_test === 1));
       value = `PATH_MEM[ADDR_RECEIVED_DATA];
       if(value === data_expected[i])
-      	$display("----------------- \nTEST SUCCESS\n----------------- \n");
-		  else
-			  $display("----------------- \nError!! TEST FAILED\n----------------- \n");
+        $display("----------------- \nTEST SUCCESS\n----------------- \n");
+      else
+        $display("----------------- \nError!! TEST FAILED\n----------------- \n");
     end
   end
-
-	initial begin
-		$dumpfile("wave.vcd");
+/*
+  initial begin
+    $dumpfile("wave.vcd");
     $dumpvars(5);
-	end
-
+  end
+*/
   task load_test;
     input [8*NAME_WIDTH : 0] name;
   begin
@@ -78,7 +78,7 @@ module tb;
     @(negedge clk);
     arst_n = 0;
     load_test(name);
-		@(negedge clk) arst_n = 1;
+    @(negedge clk) arst_n = 1;
 
     await_count = EXPIRED_NUMBER_CLK;
     end_test = `PATH_MEM[ADDR_VALID_TRUE];
@@ -89,15 +89,15 @@ module tb;
     end
     if(!await_count) begin
       $display("\n\nerror: Out of time");
-			$finish;
-		end
+      $finish;
+    end
     `PATH_MEM[ADDR_VALID_TRUE] = 0;
   end
   endtask
 
   //test data for mips
   initial begin
-    name_test[0] = "test.dat"; data_expected[0] = 'h30;
+    name_test[0] = "program.dat"; data_expected[0] = 21;
   end
 
 endmodule

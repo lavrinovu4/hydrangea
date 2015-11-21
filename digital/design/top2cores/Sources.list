@@ -1,0 +1,3 @@
+top2cores.v
+bus_ctrl.v
+cpu_regs.v

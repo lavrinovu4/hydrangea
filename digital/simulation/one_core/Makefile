@@ -1,5 +1,5 @@
 COMP = mips-linux-gnu
-ALL_LIST_NAME ?= .list
+ALL_LIST_NAME ?= .srclist
 
 AFLAGS =  -mips1 -EL
 LFLAGS =  --no-check-sections -e 0 -Ttext 0 -Tbss 0x500 -EL
@@ -8,6 +8,8 @@ all: compile sim
 compile: check t0.dat t1.dat t2.dat t3.dat t4.dat t4.dat t5.dat t6.dat t7.dat
 
 clean: clean_v clean_cc
+	rm -f $(ALL_LIST_NAME)
+
 clean_all: clean_v_all clean_cc_all
 
 SOURCES_LIST = . ../../models/memory ../../design/mips

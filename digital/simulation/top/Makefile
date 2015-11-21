@@ -3,9 +3,9 @@ ALL_LIST_NAME ?= .srclist
 
 all: compile sim
 
-compile: check test.dat
+compile: check program.dat
 
-test.elf:
+program.elf:
 	make -C compile
 
 clean: clean_v clean_cc
@@ -14,7 +14,7 @@ clean: clean_v clean_cc
 
 clean_all: clean_v_all clean_cc_all
 
-SOURCES_LIST = . ../../models/memory ../../design/mips ../../design/leds ../../design/wishbone_arbiter
+SOURCES_LIST = . ../../models/memory ../../design/mips ../../design/leds ../../design/wishbone_arbiter ../../design/top2cores ../../design/top
 
 FILE_LIST = $(foreach i,$(SOURCES_LIST),\
 								$(foreach file,$(shell cat $i/Sources.list),\
