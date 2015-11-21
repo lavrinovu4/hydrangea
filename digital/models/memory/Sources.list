@@ -1,2 +1,2 @@
-wb_slave_test.v
+memory_wb.v
 memory.v

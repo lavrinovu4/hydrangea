@@ -24,7 +24,7 @@ module tb;
   reg [31 : 0] data_expected [N_TEST - 1 : 0];
   reg [31 : 0] value;
 
-  integer i, end_test; 
+  integer i, end_test;
 
   wire [15:0] leds;
 
@@ -39,11 +39,11 @@ module tb;
 		clk = 0;
 		forever clk = #(PERIOD/2) ~clk;
 	end
-  
+
 
   //generate input data
 	initial begin
-    @(negedge clk); 
+    @(negedge clk);
 
     for(i = 0; i < N_TEST; i++) begin
       test_launch(name_test[i]);
@@ -62,7 +62,7 @@ module tb;
       	$display("----------------- \nTEST SUCCESS\n----------------- \n");
 		  else
 			  $display("----------------- \nError!! TEST FAILED\n----------------- \n");
-    end 
+    end
   end
 
 	initial begin
@@ -95,10 +95,6 @@ module tb;
       end_test = `PATH_MEM[ADDR_VALID_TRUE];
     end
     if(!await_count) begin
-      if(u_dut.u_leds.o_leds == 'h30)
-        $display("\nTest OK");
-      else
-        $display("\nTest BAD: %d", u_dut.u_leds.o_leds);
       $display("\n\nerror: Out of time");
 			$finish;
 		end
@@ -108,7 +104,7 @@ module tb;
 
   //test data for mips
   initial begin
-    name_test[0] = "test.dat"; data_expected[0] = 21;
+    name_test[0] = "test.dat"; data_expected[0] = 'h30;
   end
 
 endmodule

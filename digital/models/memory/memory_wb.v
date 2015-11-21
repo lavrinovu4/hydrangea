@@ -1,12 +1,8 @@
-// Test wb slave
-
-`timescale 1ns / 1ps
-
 `define WB_DWIDTH 32
 `define WB_SWIDTH 4
 `define WB_AWIDTH 30
 
-module wb_slave_test (
+module memory_wb (			
 														i_ck,
 														i_rb,
 

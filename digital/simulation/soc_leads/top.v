@@ -25,8 +25,8 @@ localparam WB_DWIDTH = 32;
     wire      [WB_MASTERS-1:0]  m_wb_cyc                      ;
     wire      [WB_MASTERS-1:0]  m_wb_stb                      ;
     wire      [WB_MASTERS-1:0]  m_wb_ack                      ;
-    
-    
+
+
     // Wishbone Slave Buses
     wire      [31:0]            s_wb_adr      [WB_SLAVES-1:0];
     wire      [WB_SWIDTH-1:0]   s_wb_sel      [WB_SLAVES-1:0];
@@ -39,9 +39,10 @@ localparam WB_DWIDTH = 32;
 
 
   //the highest module of mips
-  top_2cores u_core(
+  core u_core(
     .i_clk        ( i_clk     ),
     .i_arst_n     ( i_arst_n  ),
+    .i_core_en    ( 1'b1 ),
     .i_int_source ( ext_int   ),
 
     .o_wb_cyc     ( m_wb_cyc  [0] ),
@@ -54,10 +55,10 @@ localparam WB_DWIDTH = 32;
     .i_wb_ack     ( m_wb_ack  [0] ));
 
 
-  memory_wb  mem(     
+  memory_wb  mem(
                             .i_ck(i_clk),
                             .i_rb(i_arst_n),
-                            
+
                             .i_wb_we(s_wb_we   [0] ),
                             .i_wb_sel(s_wb_sel  [0] ),
                             .i_wb_adr(s_wb_adr  [0] ),
@@ -67,13 +68,13 @@ localparam WB_DWIDTH = 32;
                             .o_wb_dat(s_wb_dat_r[0] ),
                             .o_wb_ack(s_wb_ack  [0] )
                                         );
- 
 
-  leds  u_leds(     
+
+  leds  u_leds(
                             .i_ck(i_clk),
                             .i_rb(i_arst_n),
 
-                            
+
                             .i_wb_we(s_wb_we   [1]),
                             .i_wb_sel(s_wb_sel  [1]),
                             .i_wb_adr(s_wb_adr  [1]),
