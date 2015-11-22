@@ -10,7 +10,7 @@ module tb;
   parameter EXPIRED_NUMBER_CLK = 20000; //max time for one test
 
   parameter ADDR_VALID_TRUE = 320;      //address of flag valid data inside memory of data
-  parameter ADDR_RECEIVED_DATA = 321;   //addres where test save data result
+  // parameter ADDR_RECEIVED_DATA = 321;   //addres where test save data result
 
   localparam NAME_WIDTH = 16;
   reg [8*NAME_WIDTH : 0] name_test [N_TEST - 1 : 0];
@@ -50,7 +50,7 @@ module tb;
   initial begin
     forever begin
       @(posedge (end_test === 1));
-      value = `PATH_MEM[ADDR_RECEIVED_DATA];
+      value = leds; // `PATH_MEM[ADDR_RECEIVED_DATA];
       if(value === data_expected[i])
         $display("----------------- \nTEST SUCCESS\n----------------- \n");
       else
@@ -91,13 +91,14 @@ module tb;
       $display("\n\nerror: Out of time");
       $finish;
     end
+    @(negedge clk);
     `PATH_MEM[ADDR_VALID_TRUE] = 0;
   end
   endtask
 
   //test data for mips
   initial begin
-    name_test[0] = "program.dat"; data_expected[0] = 21;
+    name_test[0] = "program.dat"; data_expected[0] = 'h1460;
   end
 
 endmodule

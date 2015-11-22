@@ -5,7 +5,7 @@ all: compile sim
 
 compile: check test.dat
 
-test.elf:
+test.elf: compile/*
 	make -C compile
 
 clean: clean_v clean_cc
@@ -60,23 +60,12 @@ clean_v_all: clean
 #Compilation
 #
 ##########################################################
-AS = $(COMP)-as
-LD = $(COMP)-ld
 DIS = $(COMP)-objdump
-
-AFLAGS += -mips1
-LFLAGS +=
 
 .PHONY: clean_cc clean_cc_all
 
 check:
-	$(AS) --version >> /dev/null || echo "You should install gcc for mips: https://sourcery.mentor.com/GNUToolchain/release2791" || exit 1
-
-%.o: %.s
-	$(AS) $(AFLAGS) -o $@ $<
-
-%.elf: %.o
-	$(LD) $(LFLAGS) $< -o $@
+	$(DIS) --version >> /dev/null || echo "You should install gcc for mips: https://sourcery.mentor.com/GNUToolchain/release2791" || exit 1
 
 %.dis: %.elf
 	$(DIS) -d --disassemble-zeroes $< > $@
@@ -85,7 +74,7 @@ check:
 	cat $< | grep -v "[0-9a-fA-F]\{9\}" | grep --only-matching "^ *[0-9a-fA-F]\+:[^0-9a-fA-F]*[0-9a-fA-F ]\+" | tr -d " " | grep --only-matching "[0-9a-fA-F]\{8\}" > $@
 
 clean_cc:
-	rm -f *.elf *.o *.dis
+	rm -f *.elf *.dis
 
 clean_cc_all: clean_cc
 	rm -f *.dat

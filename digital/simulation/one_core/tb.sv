@@ -54,7 +54,7 @@ module tb;
     .o_wb_stb     (mips_wb_stb)
   );
 
-  wb_slave_test mem (
+  memory_wb mem (
     .i_ck         (clk),
     .i_rb         (arst_n),
 
