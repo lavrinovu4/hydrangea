@@ -6,7 +6,7 @@ all: compile sim
 compile: check program.dat
 
 program.elf: compile/*
-	make -C compile
+	make -C compile CFLAGS=-DFOR_SIMULATION=1
 
 clean: clean_v clean_cc
 	rm -f $(ALL_LIST_NAME)

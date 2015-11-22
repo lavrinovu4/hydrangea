@@ -48,19 +48,31 @@ void shift(int hight_low) {
 }
 
 int main() {
-  int i;
 
   LED |= 3;
   call_cpu_par(&func_par, INIT, 0x50, 0, 0, 0);
 
+#ifdef FOR_SIMULATION
+
+  int i;
   for(i = 0; i < MAX_CYCLE; i++) {
+
+#else
+
+  for(;;) {
+
+#endif
+
     register int k = 0x100;
     while(--k);
     shift(0);
     call_cpu_par(&func_par, SHIFT, 1, 0, 0, 0);
   }
 
+#ifdef FOR_SIMULATION
   end_simulation();
 
   return 0;
+#endif
+
 }
