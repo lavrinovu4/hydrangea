@@ -1,17 +1,17 @@
 # -------------------------------------------------------------------------- #
 #
 # Copyright (C) 1991-2013 Altera Corporation
-# Your use of Altera Corporation's design tools, logic functions 
-# and other software and tools, and its AMPP partner logic 
-# functions, and any output files from any of the foregoing 
-# (including device programming or simulation files), and any 
-# associated documentation or information are expressly subject 
-# to the terms and conditions of the Altera Program License 
-# Subscription Agreement, Altera MegaCore Function License 
-# Agreement, or other applicable license agreement, including, 
-# without limitation, that your use is for the sole purpose of 
-# programming logic devices manufactured by Altera and sold by 
-# Altera or its authorized distributors.  Please refer to the 
+# Your use of Altera Corporation's design tools, logic functions
+# and other software and tools, and its AMPP partner logic
+# functions, and any output files from any of the foregoing
+# (including device programming or simulation files), and any
+# associated documentation or information are expressly subject
+# to the terms and conditions of the Altera Program License
+# Subscription Agreement, Altera MegaCore Function License
+# Agreement, or other applicable license agreement, including,
+# without limitation, that your use is for the sole purpose of
+# programming logic devices manufactured by Altera and sold by
+# Altera or its authorized distributors.  Please refer to the
 # applicable agreement for further details.
 #
 # -------------------------------------------------------------------------- #
@@ -46,7 +46,7 @@ set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (Verilog)"
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim (Verilog)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_simulation
 
 set_global_assignment -name VERILOG_MACRO "SRAM_C2=1"
@@ -77,26 +77,27 @@ set_location_assignment PIN_Y21 -to o_leds[15]
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_FILE ../digital/top2cores/top2cores.v
-set_global_assignment -name VERILOG_FILE ../digital/top2cores/cpu_regs.v
-set_global_assignment -name VERILOG_FILE ../digital/top2cores/bus_ctrl.v
-set_global_assignment -name VERILOG_FILE ../digital/wishbone_arbiter/wishbone_arbiter.v
-set_global_assignment -name VERILOG_FILE ../digital/top/top.v
-set_global_assignment -name VERILOG_FILE ../digital/leds/leds.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/wishbone.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/shifter.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/register_file.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/mips_cu.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/mem_access.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/hazard_cu.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/fetch.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/execute.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/decode.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/core.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/coprocessor.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/alu_cu.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/alu.v
-set_global_assignment -name VERILOG_FILE ../digital/mips/additional_alu.v
-set_global_assignment -name VERILOG_FILE ../digital/memory/memory_wb.v
+set_global_assignment -name VERILOG_FILE ../design/top2cores/top2cores.v
+set_global_assignment -name VERILOG_FILE ../design/top2cores/cpu_regs.v
+set_global_assignment -name VERILOG_FILE ../design/top2cores/bus_ctrl.v
+set_global_assignment -name VERILOG_FILE ../design/wishbone_arbiter/wishbone_arbiter.v
+set_global_assignment -name VERILOG_FILE ../design/top/top.v
+set_global_assignment -name VERILOG_FILE ../design/leds/leds.v
+set_global_assignment -name VERILOG_FILE ../design/mips/wishbone.v
+set_global_assignment -name VERILOG_FILE ../design/mips/shifter.v
+set_global_assignment -name VERILOG_FILE ../design/mips/register_file.v
+set_global_assignment -name VERILOG_FILE ../design/mips/mips_cu.v
+set_global_assignment -name VERILOG_FILE ../design/mips/mem_access.v
+set_global_assignment -name VERILOG_FILE ../design/mips/hazard_cu.v
+set_global_assignment -name VERILOG_FILE ../design/mips/fetch.v
+set_global_assignment -name VERILOG_FILE ../design/mips/execute.v
+set_global_assignment -name VERILOG_FILE ../design/mips/decode.v
+set_global_assignment -name VERILOG_FILE ../design/mips/core.v
+set_global_assignment -name VERILOG_FILE ../design/mips/coprocessor.v
+set_global_assignment -name VERILOG_FILE ../design/mips/alu_cu.v
+set_global_assignment -name VERILOG_FILE ../design/mips/alu.v
+set_global_assignment -name VERILOG_FILE ../design/mips/additional_alu.v
+set_global_assignment -name VERILOG_FILE ../models/memory/memory_wb.v
 set_global_assignment -name QIP_FILE mem/sram.qip
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR simulation -section_id eda_simulation

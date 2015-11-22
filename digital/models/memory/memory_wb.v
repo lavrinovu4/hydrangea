@@ -5,7 +5,7 @@
 module memory_wb (			
 														i_ck,
 														i_rb,
-
+														
 													  i_wb_we,
   													i_wb_sel,
 														i_wb_adr,
@@ -15,20 +15,20 @@ module memory_wb (
 														o_wb_dat,
 														o_wb_ack
 																				);
-
+		
 	input										i_ck;
 	input										i_rb;
-
+																			
 	input 										i_wb_we;
 	input [`WB_SWIDTH - 1:0]	i_wb_sel;
 	input	[`WB_AWIDTH - 1:0]  i_wb_adr;
 	input	[`WB_DWIDTH - 1:0]	i_wb_dat;
 	input											i_wb_cyc;
 	input											i_wb_stb;
-
+	
 	output	[`WB_DWIDTH - 1:0]	o_wb_dat;
-	output											o_wb_ack;
-
+	output											o_wb_ack;																		
+	
 	////////////////////////////////////////
 
 	wire start_write;
@@ -53,6 +53,8 @@ module memory_wb (
 	assign start_read  = i_wb_stb && !i_wb_we && !start_read_r && !start_write_r;
 	assign o_wb_ack    = i_wb_stb && ( start_write || start_read_r );
 
+	`ifndef SRAM_C2
+
 	memory u_mem (
 		.i_clk			(i_ck),
 		.i_address	(i_wb_adr),
@@ -61,7 +63,20 @@ module memory_wb (
 		.i_din			(i_wb_dat),
 		.o_dout			(o_wb_dat));
 
+`else
+
+sram u_mem (
+  .address  (i_wb_adr[10 : 0]),
+  .byteena 	(i_wb_sel),
+  .clock    (i_ck),
+  .data     (i_wb_dat),
+  .wren     (start_write),
+  .q        (o_wb_dat));
+
+`endif
+
  endmodule
-
-
-
+		
+		
+		
+		
