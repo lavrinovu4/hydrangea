@@ -7,6 +7,7 @@ COMP = mips-linux-gnu
 all: synthesis gen_netlist
 
 .PRECIOUS: %.mif
+.PHONY: ../../sw/top/program.elf
 
 ../../sw/top/program.elf:
 	make -C ../../sw/top
@@ -52,7 +53,9 @@ $(RESULT)/%.sof: $(FILES) $(NAME_PROJECT).qsf $(MEMORY)
 	quartus_asm $(NAME_PROJECT) --64bit
 
 $(SIMULATION)/%.vo: $(RESULT)/%.sof
-	quartus_eda $(NAME_PROJECT) --64bit --simulation --tool=modelsim --format=verilog --output_directory=$(SIMULATION)
+	quartus_eda $(NAME_PROJECT) --64bit --simulation --tool=ncsim --format=verilog --output_directory=$(SIMULATION)
+	mv $@ $(@:.vo=.v)
+	mv $(@:.vo=_v.sdo) $(@:.vo=_v.sdf)
 
 ##########################################################
 #
