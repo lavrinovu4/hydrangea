@@ -12,3 +12,4 @@ mips_cu.v
 register_file.v
 shifter.v
 wishbone.v
+cache_ro.v
