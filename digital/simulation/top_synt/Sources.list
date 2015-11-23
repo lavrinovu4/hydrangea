@@ -1,0 +1,3 @@
+tb.sv
+../../models/cycloneii/cycloneii_atoms.v
+../../synthesis/simulation/mips_2core_soc.v
