@@ -1,0 +1,4 @@
+set_statement_scoring
+set_branch_scoring
+set_expr_scoring -all
+select_functional

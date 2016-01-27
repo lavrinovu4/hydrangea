@@ -1,0 +1,3 @@
+tb.sv
+../../design/mips/cache_ro.v
+../../models/memory/sram_cache.v

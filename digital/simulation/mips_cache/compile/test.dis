@@ -1,0 +1,84 @@
+
+test.elf:     file format elf32-tradlittlemips
+
+
+Disassembly of section .text:
+
+00000000 <_ftext>:
+.equ beg_stack, 0x1800
+.equ end_stack, 0x2000
+
+__init:
+	j __start
+   0:	08000004 	j	10 <__start>
+   4:	00000000 	nop
+	j __testfail
+   8:	0800000b 	j	2c <__testfail>
+   c:	00000000 	nop
+
+00000010 <__start>:
+
+__start:
+	lui $fp, %hi(beg_stack)
+  10:	3c1e0000 	lui	s8,0x0
+	ori $fp, $fp, %lo(beg_stack)
+  14:	37de1800 	ori	s8,s8,0x1800
+	
+	lui $sp, %hi(end_stack)
+  18:	3c1d0000 	lui	sp,0x0
+	ori $sp, $sp, %lo(end_stack)
+  1c:	37bd2000 	ori	sp,sp,0x2000
+
+	addiu $ra, $0, __init
+  20:	241f0000 	li	ra,0
+	j main
+  24:	08000014 	j	50 <main>
+  28:	00000000 	nop
+
+0000002c <__testfail>:
+
+
+__testfail:
+	mfc0 $2, $13
+  2c:	40026800 	mfc0	v0,c0_cause
+  30:	00000000 	nop
+	sw $2, 0x504($0)
+  34:	ac020504 	sw	v0,1284(zero)
+	addiu $2, $0, 0x1
+  38:	24020001 	li	v0,1
+	sw $2, 0x500($0)
+  3c:	ac020500 	sw	v0,1280(zero)
+
+00000040 <_testfail_loop>:
+_testfail_loop:
+	j _testfail_loop
+  40:	08000010 	j	40 <_testfail_loop>
+  44:	00000000 	nop
+	...
+
+00000050 <main>:
+int a;
+
+int main() {
+  50:	27bdfff8 	addiu	sp,sp,-8
+  54:	afbe0004 	sw	s8,4(sp)
+  58:	03a0f021 	move	s8,sp
+  a = 0x30;
+  5c:	3c020000 	lui	v0,0x0
+  60:	24030030 	li	v1,48
+  64:	ac431000 	sw	v1,4096(v0)
+  *((int *)0x2000) = a;
+  68:	24022000 	li	v0,8192
+  6c:	3c030000 	lui	v1,0x0
+  70:	8c631000 	lw	v1,4096(v1)
+  74:	00000000 	nop
+  78:	ac430000 	sw	v1,0(v0)
+
+  *((int *)0x500) = 1;
+  7c:	24020500 	li	v0,1280
+  80:	24030001 	li	v1,1
+  84:	ac430000 	sw	v1,0(v0)
+
+  while(1);
+  88:	08000022 	j	88 <main+0x38>
+  8c:	00000000 	nop

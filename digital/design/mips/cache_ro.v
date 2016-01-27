@@ -29,7 +29,7 @@ module cache_ro (
   output [29:0] o_mem_addr    ;
 
   parameter BLOCK_WIDTH = 3;
-  parameter INDEX_WIDTH = 5;
+  parameter INDEX_WIDTH = 3;
   parameter WAYS_SIZE = 8;
   localparam TAG_WIDTH = 30 - BLOCK_WIDTH - INDEX_WIDTH;
 
@@ -49,7 +49,7 @@ module cache_ro (
   wire miss;
   reg [INDEX_WIDTH - 1:0] ind_addr_rg;
   wire all_valid;
-  reg [WAYS_SIZE - 1:0] counter_rand;
+  reg [log2(WAYS_SIZE) - 1:0] counter_rand;
   reg [WAYS_SIZE - 1:0] cache_way_sel;
 
   wire cache_we;
@@ -67,21 +67,21 @@ module cache_ro (
             CACHE_SAFE     = 2,
             WAIT_DATA_WRITE_CACHE = 3;
 
-  assign {tag_addr, ind_addr, bl_addr} = i_cache_addr;
+  assign {tag_addr, ind_addr, bl_addr} = i_cache_addr & {30{i_cache_req}};
 
   generate
     if(WAYS_SIZE == 8) begin
-      
+
       always @(posedge i_ck, negedge i_rb) begin
         if(~i_rb)
           counter_rand <= 3'h0;
         else if(i_cache_req)
           counter_rand <= counter_rand + 3'h1;
       end
-    
+
       always @* begin
         cache_way_sel = 0;
-    
+
         if(all_valid)
           cache_way_sel[counter_rand] = 1'b1;
         else begin
@@ -104,7 +104,7 @@ module cache_ro (
 
   assign cache_way_we = cache_way_sel & {WAYS_SIZE{cache_we}};
 
-  generate 
+  generate
 
     for(i = 0; i < WAYS_SIZE; i = i + 1) begin: ways
 
@@ -118,35 +118,35 @@ module cache_ro (
         .DATA_WIDTH(TAG_WIDTH + 1 )
       )
       u_tag_mem(
-        .i_ck     ( i_ck     ),              
-        .i_addr   ( ind_addr ),                
-        .i_we     ( cache_way_we[i] ),              
+        .i_ck     ( i_ck     ),
+        .i_addr   ( ind_addr ),
+        .i_we     ( cache_way_we[i] ),
         .i_data_w ( {1'b1, tag_addr} ),
-      
+
         .o_data_r ( {valid_way[i], tag_cached_way} )
       );
-    
+
       assign hit_way[i] = ( tag_addr == tag_cached_way ) & valid_way[i];
-    
-    
+
+
       sram_cache #(
         .ADDR_WIDTH(INDEX_WIDTH      ),
         .DATA_WIDTH(BLOCK_BIT_WIDTH  )
       )
       u_block_mem(
-        .i_ck     ( i_ck               ),              
-        .i_addr   ( ind_addr           ),                
-        .i_we     ( cache_way_we[i]    ),              
-        .i_data_w ( block_data_w       ),                  
-      
+        .i_ck     ( i_ck               ),
+        .i_addr   ( ind_addr           ),
+        .i_we     ( cache_way_we[i]    ),
+        .i_data_w ( block_data_w       ),
+
         .o_data_r ( block_data_cached  )
       );
-    
+
       //TODO: only for BLOCK_WIDTH = 3(2^3 = 8)
       if(BLOCK_WIDTH == 3) begin
         always @* begin
           data_cached = block_data_cached[31:0];
-      
+
           case(bl_addr)
             1: data_cached = block_data_cached[63:32];
             2: data_cached = block_data_cached[95:64];
@@ -158,14 +158,14 @@ module cache_ro (
           endcase
         end
       end
-    
+
       //TODO: trouble data_cached_and_valid_way became a multi dim array
       if(i == 0)
         assign data_cached_and_valid_way = data_cached & {32{hit_way[i]}};
       else
         assign data_cached_and_valid_way = data_cached & {32{hit_way[i]}} | ways[i - 1].data_cached_and_valid_way;
 
-    end //for 
+    end //for
 
   endgenerate
 
@@ -181,6 +181,7 @@ module cache_ro (
   assign o_cache_ack = (ind_addr == ind_addr_rg) & i_cache_req & hit; //TODO:check it correct handled
   assign o_cache_data = ways[WAYS_SIZE - 1].data_cached_and_valid_way;
 
+  // TODO: n - can decrease a size by inclue new var
   assign miss = (ind_addr == ind_addr_rg) & i_cache_req & ~hit;
 
   assign all_valid = &valid_way;
@@ -201,10 +202,10 @@ module cache_ro (
   end
 
   generate
-    
+
     for(k = 0; k < 2**BLOCK_WIDTH; k = k + 1) begin
 
-    always @* 
+    always @*
       block_data_w[32*(k+1)-1 : 32*k] = buf_mem[k];
 
     end
@@ -238,5 +239,18 @@ module cache_ro (
 
   assign cache_we = state == CACHE_SAFE;
   assign o_mem_req = state == COUNT;
+
+  function integer log2;
+    input [31 : 0] number;
+
+    integer i;
+
+    begin
+      log2 = 0;
+      for (i = 0; 2**i < number; i = i + 1) begin
+        log2 = i + 1;
+      end
+    end
+  endfunction
 
 endmodule
